@@ -1,0 +1,26 @@
+diff --git a/Android.mk b/Android.mk
+index 49146f4..1da1846 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -57,7 +57,7 @@ LOCAL_CFLAGS += -DNFC_NXP_ESE=FALSE
+ endif
+ 
+ #### Select the CHIP ####
+-D_CFLAGS += -DNFC_NXP_CHIP_TYPE=PN548C2
++D_CFLAGS += -DNFC_NXP_CHIP_TYPE=PN547C2
+ 
+ #Gemalto SE support
+ D_CFLAGS += -DGEMALTO_SE_SUPPORT
+diff --git a/halimpl/pn54x/Android.mk b/halimpl/pn54x/Android.mk
+index 5b200a7..825a385 100644
+--- a/halimpl/pn54x/Android.mk
++++ b/halimpl/pn54x/Android.mk
+@@ -65,7 +65,7 @@ LOCAL_CFLAGS += -DPN548C2=2
+ endif
+ 
+ #### Select the CHIP ####
+-LOCAL_CFLAGS += -DNFC_NXP_CHIP_TYPE=PN548C2
++LOCAL_CFLAGS += -DNFC_NXP_CHIP_TYPE=PN547C2
+ 
+ LOCAL_CFLAGS += -DANDROID \
+         -DNXP_UICC_ENABLE -DNXP_HW_SELF_TEST
