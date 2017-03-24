@@ -1,0 +1,151 @@
+diff --git a/nci/jni/NativeNfcManager.cpp b/nci/jni/NativeNfcManager.cpp
+old mode 100644
+new mode 100755
+index c79db9d..7fd2ddd
+--- a/nci/jni/NativeNfcManager.cpp
++++ b/nci/jni/NativeNfcManager.cpp
+@@ -4849,9 +4849,6 @@ void checkforTranscation(UINT8 connEvent, void* eventData)
+             ALOGD("ACTIVATED_EVT setting flag");
+             transaction_data.current_transcation_state = NFA_TRANS_ACTIVATED_EVT;
+             set_transcation_stat(true);
+-#if (NFC_NXP_CHIP_TYPE == PN548C2)
+-            nfcManagerEnableAGCDebug(connEvent);
+-#endif
+         }else{
+ //            ALOGD("other event clearing flag ");
+ //            memset(&transaction_data, 0x00, sizeof(Transcation_Check_t));
+@@ -4861,9 +4858,6 @@ void checkforTranscation(UINT8 connEvent, void* eventData)
+         if (transaction_data.current_transcation_state == NFA_TRANS_DEFAULT
+             || transaction_data.current_transcation_state == NFA_TRANS_ACTIVATED_EVT)
+         {
+-#if (NFC_NXP_CHIP_TYPE == PN548C2)
+-            nfcManagerEnableAGCDebug(connEvent);
+-#endif
+             if(getScreenState() == NFA_SCREEN_STATE_OFF)
+             {
+                 if (!sP2pActive && eventDM_Conn_data->rf_field.status == NFA_STATUS_OK)
+@@ -4885,10 +4879,7 @@ void checkforTranscation(UINT8 connEvent, void* eventData)
+         break;
+     case NFA_TRANS_CE_ACTIVATED:
+         if (transaction_data.current_transcation_state == NFA_TRANS_DEFAULT || transaction_data.current_transcation_state == NFA_TRANS_ACTIVATED_EVT)
+-            {
+-#if (NFC_NXP_CHIP_TYPE == PN548C2)
+-            nfcManagerEnableAGCDebug(connEvent);
+-#endif
++        {
+             if(getScreenState() == NFA_SCREEN_STATE_OFF)
+             {
+                 if (!sP2pActive && eventDM_Conn_data->rf_field.status == NFA_STATUS_OK)
+@@ -4896,7 +4887,7 @@ void checkforTranscation(UINT8 connEvent, void* eventData)
+             }
+                 transaction_data.current_transcation_state = NFA_TRANS_CE_ACTIVATED;
+                 set_transcation_stat(true);
+-            }
++        }
+         break;
+     case NFA_TRANS_CE_DEACTIVATED:
+         if (transaction_data.current_transcation_state == NFA_TRANS_CE_ACTIVATED)
+@@ -4914,48 +4905,18 @@ void checkforTranscation(UINT8 connEvent, void* eventData)
+ #endif
+     case NFA_TRANS_DM_RF_FIELD_EVT:
+         if (eventDM_Conn_data->rf_field.status == NFA_STATUS_OK &&
+-                (transaction_data.current_transcation_state == NFA_TRANS_EE_ACTION_EVT
+-                        || transaction_data.current_transcation_state == NFA_TRANS_CE_DEACTIVATED)
+-                && eventDM_Conn_data->rf_field.rf_field_status == 0)
+-        {
+-            ALOGD("start_timer");
+-#if (NFC_NXP_CHIP_TYPE == PN548C2)
+-            set_AGC_process_state(false);
+-#endif
+-            transaction_data.current_transcation_state = NFA_TRANS_DM_RF_FIELD_EVT_OFF;
+-            scleanupTimerProc_transaction.set (50, cleanupTimerProc_transaction);
+-        }
+-        else if (eventDM_Conn_data->rf_field.status == NFA_STATUS_OK &&
+-                transaction_data.current_transcation_state == NFA_TRANS_DM_RF_FIELD_EVT_OFF &&
+-                eventDM_Conn_data->rf_field.rf_field_status == 1)
++            eventDM_Conn_data->rf_field.rf_field_status == 1)
+         {
+ #if (NFC_NXP_CHIP_TYPE == PN548C2)
+-            set_AGC_process_state(true);
++            nfcManagerEnableAGCDebug(connEvent);
+ #endif
+-            transaction_data.current_transcation_state = NFA_TRANS_DM_RF_FIELD_EVT_ON;
+-            ALOGD("Payment is in progress hold the screen on/off request ");
+-            transaction_data.current_transcation_state = NFA_TRANS_DM_RF_TRANS_START;
+-            scleanupTimerProc_transaction.kill ();
+-
+         }
+         else if (eventDM_Conn_data->rf_field.status == NFA_STATUS_OK &&
+-                transaction_data.current_transcation_state == NFA_TRANS_DM_RF_TRANS_START &&
+-                eventDM_Conn_data->rf_field.rf_field_status == 0)
++                 eventDM_Conn_data->rf_field.rf_field_status == 0)
+         {
+-            ALOGD("Transcation is done");
+ #if (NFC_NXP_CHIP_TYPE == PN548C2)
+             set_AGC_process_state(false);
+ #endif
+-            transaction_data.current_transcation_state = NFA_TRANS_DM_RF_TRANS_PROGRESS;
+-            //set_transcation_stat(false);
+-            cleanup_timer();
+-        }else if(eventDM_Conn_data->rf_field.status == NFA_STATUS_OK &&
+-                transaction_data.current_transcation_state == NFA_TRANS_ACTIVATED_EVT &&
+-                eventDM_Conn_data->rf_field.rf_field_status == 0)
+-        {
+-
+-            ALOGD("No transaction done cleaning up the variables");
+-            cleanup_timer();
+         }
+         break;
+     default:
+@@ -5753,34 +5714,30 @@ static void nfcManagerEnableAGCDebug(UINT8 connEvent)
+         ALOGD ("%s AGCDebug not enabled", __FUNCTION__);
+         return;
+     }
+-    switch(connEvent)
++
++    ALOGD ("%s connEvent=%d, menableAGC_debug_t.AGCdebugstarted=%d", __FUNCTION__, connEvent, menableAGC_debug_t.AGCdebugrunning);
++
++    if(connEvent == NFA_TRANS_DM_RF_FIELD_EVT &&
++       menableAGC_debug_t.AGCdebugrunning == false)
+     {
+-        case NFA_ACTIVATED_EVT:
+-        case NFA_EE_ACTION_EVT:
+-        case NFA_TRANS_CE_ACTIVATED:
+-            if(menableAGC_debug_t.AGCdebugstarted == false)
+-            {
+-                pthread_t agcThread;
+-                pthread_attr_t attr;
+-                pthread_attr_init(&attr);
+-                pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+-                retvalue = pthread_create(&agcThread, &attr, enableAGCThread, NULL);
+-                pthread_attr_destroy(&attr);
+-                if(retvalue == 0)
+-                {
+-                    menableAGC_debug_t.AGCdebugstarted = true;
+-                    set_AGC_process_state(true);
+-                }
+-            }
+-            break;
++        pthread_t agcThread;
++        pthread_attr_t attr;
++        pthread_attr_init(&attr);
++        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
++        retvalue = pthread_create(&agcThread, &attr, enableAGCThread, NULL);
++        pthread_attr_destroy(&attr);
++        if(retvalue == 0)
++        {
++            menableAGC_debug_t.AGCdebugrunning = true;
++            set_AGC_process_state(true);
++        }
+     }
+-
+ }
+ 
+ void *enableAGCThread(void *arg)
+ {
+     tNFA_STATUS status = NFA_STATUS_FAILED;
+-    while( menableAGC_debug_t.AGCdebugstarted == true )
++    while( menableAGC_debug_t.AGCdebugrunning == true )
+     {
+         if(get_AGC_process_state() == false)
+         {

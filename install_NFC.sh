@@ -37,9 +37,14 @@ cd $ANDROID_BUILD_TOP
 if [ "$1" = "PN7120" ]; then
   echo "- patching specific makefile for PN7120"
   cd $ANDROID_BUILD_TOP/external/libnfc-nci
-  patch -p1 <$ANDROID_BUILD_TOP/NxpNfcAndroid/patch-external_libnfcnci.txt
+  patch -p1 <$ANDROID_BUILD_TOP/NxpNfcAndroid/patch-external_libnfcnci-pn7120.txt
   cd $ANDROID_BUILD_TOP/packages/apps/Nfc
-  patch -p1 <$ANDROID_BUILD_TOP/NxpNfcAndroid/patch-packages_apps_Nfc.txt
+  patch -p1 <$ANDROID_BUILD_TOP/NxpNfcAndroid/patch-packages_apps_Nfc-pn7120.txt
+  cd $ANDROID_BUILD_TOP
+else
+  echo "- patching specific makefile for PN7150"
+  cd $ANDROID_BUILD_TOP/packages/apps/Nfc
+  patch -p1 <$ANDROID_BUILD_TOP/NxpNfcAndroid/patch-AGCDebug-pn7150.txt
   cd $ANDROID_BUILD_TOP
 fi
 
