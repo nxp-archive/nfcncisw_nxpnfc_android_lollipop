@@ -21,15 +21,15 @@ rm -rf $ANDROID_BUILD_TOP/frameworks/base/nxp-nfc-gsma
 
 echo
 echo "- copying required files"
-mv $ANDROID_BUILD_TOP/NxpNfcAndroid/NFC_NCIHAL_base/core/java/android/nfc $ANDROID_BUILD_TOP/frameworks/base/core/java/android/
-mv $ANDROID_BUILD_TOP/NxpNfcAndroid/NFC_NCIHAL_base/core/java/com/nxp $ANDROID_BUILD_TOP/frameworks/base/core/java/com/
-mv $ANDROID_BUILD_TOP/NxpNfcAndroid/NFC_NCIHAL_base/core/java/com/vzw $ANDROID_BUILD_TOP/frameworks/base/core/java/com/
-mv $ANDROID_BUILD_TOP/NxpNfcAndroid/NFC_NCIHAL_base/nxp-nfc-gsma $ANDROID_BUILD_TOP/frameworks/base/
-rm -rf $ANDROID_BUILD_TOP/NxpNfcAndroid/NFC_NCIHAL_base
-rm -rf $ANDROID_BUILD_TOP/NxpNfcAndroid/NXPNFC_Reference
+mv $ANDROID_BUILD_TOP/NxpNfcAndroid/NfcAndroid_Base/core/java/android/nfc $ANDROID_BUILD_TOP/frameworks/base/core/java/android/
+mv $ANDROID_BUILD_TOP/NxpNfcAndroid/NfcAndroid_Base/core/java/com/nxp $ANDROID_BUILD_TOP/frameworks/base/core/java/com/
+mv $ANDROID_BUILD_TOP/NxpNfcAndroid/NfcAndroid_Base/core/java/com/vzw $ANDROID_BUILD_TOP/frameworks/base/core/java/com/
+mv $ANDROID_BUILD_TOP/NxpNfcAndroid/NfcAndroid_Base/nxp-nfc-gsma $ANDROID_BUILD_TOP/frameworks/base/
+rm -rf $ANDROID_BUILD_TOP/NxpNfcAndroid/NfcAndroid_Base
+rm -rf $ANDROID_BUILD_TOP/NxpNfcAndroid/NfcAndroid_Vendor
 
 echo
-echo "- patching required makefile"
+echo "- patching required file"
 cd $ANDROID_BUILD_TOP/frameworks/base
 patch -p1 <$ANDROID_BUILD_TOP/NxpNfcAndroid/patch-framework_base.txt
 cd $ANDROID_BUILD_TOP
